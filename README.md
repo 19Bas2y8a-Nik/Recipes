@@ -165,6 +165,25 @@ pnpm exec prisma db seed
 - Убедитесь, что используется `?sslmode=require` в строке подключения
 - Проверьте, что IP адреса Vercel разрешены в Neon (обычно разрешены по умолчанию)
 
+### Ошибка "Connection Closed" на Vercel
+
+Если вы видите ошибку `Error { kind: Closed, cause: None }`:
+
+1. **Используйте Pooler Connection для Vercel:**
+   - В строке подключения должен быть `-pooler` в хосте
+   - Пример: `postgresql://user:pass@ep-xxx-xxx-pooler.region.aws.neon.tech/db?sslmode=require`
+   - Pooler connection необходим для serverless окружений (Vercel)
+
+2. **Проверьте, что база данных активна:**
+   - Откройте Neon Dashboard
+   - Убедитесь, что статус базы данных "Active" (не "Paused")
+   - Если база заморожена, нажмите "Resume" или "Wake up"
+
+3. **Проверьте переменную окружения в Vercel:**
+   - Settings → Environment Variables
+   - Убедитесь, что `DATABASE_URL` содержит pooler connection string
+   - После изменения переменной окружения нужно передеплоить проект
+
 ### Prisma Client не найден
 
 - Убедитесь, что в `package.json` есть скрипт `build` с `prisma generate`

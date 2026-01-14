@@ -10,4 +10,12 @@ export const prisma =
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   })
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+// В serverless окружениях (Vercel) сохраняем экземпляр в global
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
+} else {
+  // В production также используем singleton для избежания множественных соединений
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = prisma
+  }
+}

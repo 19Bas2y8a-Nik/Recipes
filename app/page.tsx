@@ -15,6 +15,23 @@ async function getNotes() {
       console.error('Error message:', error.message)
       console.error('Error stack:', error.stack)
     }
+    
+    // Если соединение закрыто, пробуем переподключиться один раз
+    if (error && typeof error === 'object' && 'kind' in error && error.kind === 'Closed') {
+      console.log('Connection closed, attempting to reconnect...')
+      try {
+        await prisma.$connect()
+        const notes = await prisma.note.findMany({
+          orderBy: {
+            createdAt: 'desc',
+          },
+        })
+        return notes
+      } catch (retryError) {
+        console.error('Retry failed:', retryError)
+      }
+    }
+    
     return []
   }
 }
