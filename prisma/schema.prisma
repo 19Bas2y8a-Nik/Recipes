@@ -10,10 +10,145 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  notes       Note[]
+  recips      Recip[]
+  votes       Vote[]
+  collections Collection[]
+
+  @@map("users")
+}
+
 model Note {
   id        String   @id @default(uuid())
+  ownerId   String
   title     String
   createdAt DateTime @default(now())
 
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
   @@map("notes")
+}
+
+model Category {
+  id       String  @id @default(uuid())
+  category String  @unique
+
+  recips   Recip[]
+
+  @@map("categories")
+}
+
+model Recip {
+  id          String      @id @default(uuid())
+  ownerId     String
+  title       String
+  content     String
+  description String?
+  categoryId  String?
+  visibility  Visibility  @default(PRIVATE)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  publishedAt DateTime?
+
+  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  votes       Vote[]
+  tags        TagOnRecip[]
+  collections RecipInCollection[]
+  versions    RecipVersion[]
+
+  @@index([ownerId, updatedAt])
+  @@index([visibility, createdAt])
+  @@map("recips")
+}
+
+model Tag {
+  id        String       @id @default(uuid())
+  name      String       @unique
+  createdAt DateTime     @default(now())
+
+  recips    TagOnRecip[]
+
+  @@map("tags")
+}
+
+model TagOnRecip {
+  id        String   @id @default(uuid())
+  recipId   String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  recip     Recip    @relation(fields: [recipId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([recipId, tagId])
+  @@map("tag_on_recip")
+}
+
+model Vote {
+  id        String   @id @default(uuid())
+  userId    String
+  recipId   String
+  value     Int      @default(1)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recip     Recip    @relation(fields: [recipId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipId])
+  @@index([recipId])
+  @@index([userId])
+  @@map("votes")
+}
+
+model Collection {
+  id        String   @id @default(uuid())
+  ownerId   String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  recips    RecipInCollection[]
+
+  @@index([ownerId])
+  @@map("collections")
+}
+
+model RecipInCollection {
+  id           String     @id @default(uuid())
+  recipId      String
+  collectionId String
+  createdAt    DateTime   @default(now())
+
+  recip        Recip      @relation(fields: [recipId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([recipId, collectionId])
+  @@map("recip_in_collection")
+}
+
+model RecipVersion {
+  id        String   @id @default(uuid())
+  recipId   String
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+
+  recip     Recip    @relation(fields: [recipId], references: [id], onDelete: Cascade)
+
+  @@index([recipId, createdAt])
+  @@map("recip_versions")
+}
+
+enum Visibility {
+  PRIVATE
+  PUBLIC
 }
