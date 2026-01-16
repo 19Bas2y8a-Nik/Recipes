@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPrismaClient } from '@/lib/prisma-factory'
 import { DbType } from '@/lib/db-config'
+import { getCurrentUserId } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,6 +9,14 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { tableName: string } }
 ) {
+  const userId = await getCurrentUserId()
+  if (!userId) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams
     const dbType = (searchParams.get('db') || 'local') as DbType

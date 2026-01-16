@@ -1,4 +1,7 @@
 import { prisma } from '@/lib/prisma'
+import { getCurrentUser } from '@/lib/auth'
+import { signIn, signOut } from '@/app/api/auth/[...nextauth]/route'
+import Link from 'next/link'
 
 async function getNotes() {
   try {
@@ -38,12 +41,75 @@ async function getNotes() {
 
 export default async function Home() {
   const notes = await getNotes()
+  const user = await getCurrentUser()
 
   return (
     <main style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <h1 style={{ marginBottom: '2rem', fontSize: '2rem' }}>
-        Next.js + Prisma + NeonDB
-      </h1>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginBottom: '2rem'
+      }}>
+        <h1 style={{ fontSize: '2rem', margin: 0 }}>
+          Next.js + Prisma + NeonDB
+        </h1>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {user ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {user.image && (
+                  <img 
+                    src={user.image} 
+                    alt={user.name || 'User'} 
+                    style={{ 
+                      width: '32px', 
+                      height: '32px', 
+                      borderRadius: '50%' 
+                    }} 
+                  />
+                )}
+                <span style={{ fontSize: '0.875rem' }}>
+                  {user.name || user.email}
+                </span>
+              </div>
+              <form action={async () => {
+                'use server'
+                await signOut({ redirectTo: '/' })
+              }}>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '0.5rem 1rem',
+                    fontSize: '0.875rem',
+                    background: '#dc2626',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Выйти
+                </button>
+              </form>
+            </>
+          ) : (
+            <Link 
+              href="/login"
+              style={{
+                padding: '0.5rem 1rem',
+                fontSize: '0.875rem',
+                background: '#0070f3',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '4px'
+              }}
+            >
+              Войти
+            </Link>
+          )}
+        </div>
+      </div>
       
       <div style={{ 
         background: 'white', 
