@@ -24,3 +24,7 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.google-signin-button:hover {
+  background-color: #357ae8 !important;
+}

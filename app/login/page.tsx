@@ -1,4 +1,6 @@
-import { signIn } from '@/app/api/auth/[...nextauth]/route'
+import { signIn } from '@/lib/auth-config'
+
+export const dynamic = 'force-dynamic'
 
 export default function LoginPage() {
   return (
@@ -49,8 +51,7 @@ export default function LoginPage() {
               gap: '0.5rem',
               transition: 'background-color 0.2s'
             }}
-            onMouseOver={(e) => e.currentTarget.style.background = '#357ae8'}
-            onMouseOut={(e) => e.currentTarget.style.background = '#4285f4'}
+            className="google-signin-button"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" style={{ marginRight: '0.5rem' }}>
               <path

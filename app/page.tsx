@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
-import { signIn, signOut } from '@/app/api/auth/[...nextauth]/route'
+import { signIn, signOut } from '@/lib/auth-config'
 import Link from 'next/link'
 
 async function getNotes() {
