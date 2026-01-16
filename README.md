@@ -124,9 +124,14 @@ pnpm run start            # Запустить production сервер
 
 1. Зайдите на [Vercel](https://vercel.com)
 2. Импортируйте ваш Git репозиторий
-3. Добавьте переменную окружения:
-   - **Name**: `DATABASE_URL`
-   - **Value**: ваша строка подключения к NeonDB
+3. Добавьте переменные окружения в Settings → Environment Variables:
+   - **DATABASE_URL**: ваша строка подключения к NeonDB (с `-pooler` для serverless)
+   - **AUTH_SECRET**: сгенерированный секретный ключ (см. `ENV.md`)
+   - **GOOGLE_CLIENT_ID**: ваш Google OAuth Client ID
+   - **GOOGLE_CLIENT_SECRET**: ваш Google OAuth Client Secret
+   
+   **Важно:** Добавьте эти переменные для всех окружений (Production, Preview, Development)
+   
 4. В настройках Build Command убедитесь, что используется:
    ```
    pnpm run build
@@ -134,22 +139,50 @@ pnpm run start            # Запустить production сервер
    (Prisma Client будет сгенерирован автоматически)
    
    **Важно:** Vercel автоматически определит pnpm, если в проекте есть `packageManager` в `package.json` или `pnpm-lock.yaml`
-5. Нажмите Deploy
+   
+5. В разделе "Authorized redirect URIs" вашего Google OAuth приложения добавьте:
+   - `https://your-project.vercel.app/api/auth/callback/google` (замените на ваш домен)
+   
+6. Нажмите Deploy
 
-### 3. Post-deploy скрипт (опционально)
+### 3. Применение миграций базы данных
 
-После первого деплоя, если нужно выполнить миграции или seed:
+После первого деплоя необходимо применить миграции для создания таблиц Auth.js (users, accounts, sessions, verification_tokens):
 
-1. В Vercel Dashboard перейдите в Settings → Functions
-2. Добавьте Post-deploy hook или используйте Vercel CLI:
-
+**Вариант 1: Через Vercel CLI (рекомендуется)**
 ```bash
+# Установите Vercel CLI, если еще не установлен
+npm i -g vercel
+
+# Войдите в Vercel
+vercel login
+
+# Подключите проект
+vercel link
+
+# Примените миграции
 vercel env pull .env.local
 pnpm exec prisma migrate deploy
-pnpm exec prisma db seed
 ```
 
-Или выполните миграции через Neon Dashboard SQL Editor.
+**Вариант 2: Через Neon Dashboard**
+1. Откройте [Neon Dashboard](https://console.neon.tech)
+2. Перейдите в SQL Editor
+3. Выполните миграции вручную или используйте команду:
+   ```bash
+   pnpm exec prisma migrate deploy
+   ```
+
+**Вариант 3: Локально перед деплоем**
+```bash
+# Примените миграции локально
+pnpm run db:migrate
+
+# Или используйте db:push (для разработки)
+pnpm run db:push
+```
+
+**Важно:** После добавления аутентификации обязательно примените миграции, чтобы создать таблицы `accounts`, `sessions` и `verification_tokens` в базе данных.
 
 ## Проверка работы
 
@@ -158,6 +191,29 @@ pnpm exec prisma db seed
 Если заметок нет, выполните seed через Neon Dashboard SQL Editor или через Vercel CLI.
 
 ## Troubleshooting
+
+### Ошибка "DEPLOYMENT_NOT_FOUND" (404)
+
+Если вы видите ошибку `404: NOT_FOUND Code: DEPLOYMENT_NOT_FOUND`:
+
+1. **Проверьте URL деплоймента:**
+   - Убедитесь, что вы используете правильный URL проекта
+   - Проверьте, что проект не был удален в Vercel Dashboard
+
+2. **Передеплойте проект:**
+   - Зайдите в Vercel Dashboard → ваш проект
+   - Перейдите в раздел "Deployments"
+   - Нажмите "Redeploy" на последнем деплойменте
+   - Или создайте новый деплой через Git push
+
+3. **Проверьте настройки проекта:**
+   - Settings → General → убедитесь, что проект подключен к правильному Git репозиторию
+   - Settings → Git → проверьте, что ветка настроена правильно
+
+4. **Проверьте переменные окружения:**
+   - Settings → Environment Variables
+   - Убедитесь, что все необходимые переменные добавлены (DATABASE_URL, AUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
+   - После добавления переменных нужно передеплоить проект
 
 ### Ошибка подключения к БД
 
