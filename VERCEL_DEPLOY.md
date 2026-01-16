@@ -59,6 +59,58 @@ pnpm exec prisma migrate deploy
 
 ## Частые проблемы
 
+### "Build Failed - Command exited with 1"
+
+**Причины и решения:**
+
+1. **Отсутствуют переменные окружения:**
+   - Убедитесь, что все переменные добавлены в Vercel:
+     - `DATABASE_URL`
+     - `AUTH_SECRET`
+     - `GOOGLE_CLIENT_ID`
+     - `GOOGLE_CLIENT_SECRET`
+   - Добавьте для всех окружений (Production, Preview, Development)
+
+2. **Ошибка Prisma generate:**
+   - Проверьте, что `prisma/schema.prisma` корректный
+   - Убедитесь, что `postinstall` скрипт в `package.json` содержит `prisma generate`
+   - Проверьте логи сборки в Vercel для деталей ошибки
+
+3. **Ошибки TypeScript:**
+   - Запустите локально: `pnpm run build`
+   - Исправьте все ошибки TypeScript перед деплоем
+   - Проверьте файл `tsconfig.json`
+
+4. **Проблемы с зависимостями:**
+   - Убедитесь, что `pnpm-lock.yaml` закоммичен
+   - Проверьте, что `packageManager` указан в `package.json`
+
+**Проверка перед деплоем:**
+
+**Для Windows (PowerShell):**
+```powershell
+# Локально проверьте сборку
+pnpm install
+pnpm run build
+
+# Если сборка успешна локально, но падает на Vercel:
+# 1. Проверьте переменные окружения в Vercel
+# 2. Проверьте логи сборки в Vercel Dashboard
+# 3. Убедитесь, что все файлы закоммичены
+```
+
+**Для Linux/Mac (Bash):**
+```bash
+# Локально проверьте сборку
+pnpm install
+pnpm run build
+
+# Если сборка успешна локально, но падает на Vercel:
+# 1. Проверьте переменные окружения в Vercel
+# 2. Проверьте логи сборки в Vercel Dashboard
+# 3. Убедитесь, что все файлы закоммичены
+```
+
 ### "404: DEPLOYMENT_NOT_FOUND"
 - Проект был удален или URL неправильный
 - Решение: создайте новый деплой через Git push или Redeploy
@@ -67,9 +119,10 @@ pnpm exec prisma migrate deploy
 - Неправильный DATABASE_URL или база заморожена
 - Решение: проверьте connection string, используйте pooler, разморозьте базу в Neon
 
-### "AUTH_SECRET is missing"
+### "AUTH_SECRET is not set"
 - Переменная окружения не добавлена
 - Решение: добавьте AUTH_SECRET в Vercel Settings → Environment Variables
+- После добавления передеплойте проект
 
 ### "OAuth callback error"
 - Неправильный redirect URI в Google Console
