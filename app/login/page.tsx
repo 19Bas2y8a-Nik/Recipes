@@ -19,16 +19,32 @@ export default function LoginPage() {
         padding: '2rem', 
         borderRadius: '8px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        width: '100%'
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
+        {/* Название проекта вверху */}
         <h1 style={{ 
-          marginBottom: '2rem', 
-          fontSize: '1.5rem',
-          textAlign: 'center'
+          marginBottom: '0.5rem', 
+          fontSize: '2rem',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          color: '#333'
         }}>
-          Вход в систему
+          Recipes
         </h1>
         
+        {/* Подзаголовок */}
+        <p style={{
+          marginBottom: '2rem',
+          fontSize: '0.875rem',
+          textAlign: 'center',
+          color: '#666'
+        }}>
+          Войдите в свой аккаунт
+        </p>
+        
+        {/* Форма входа */}
         <form action={async () => {
           'use server'
           await signIn('google', { redirectTo: '/' })
@@ -49,7 +65,8 @@ export default function LoginPage() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
+              marginBottom: '1.5rem'
             }}
             className="google-signin-button"
           >
@@ -74,6 +91,18 @@ export default function LoginPage() {
             Войти через Google
           </button>
         </form>
+        
+        {/* Текст согласия внизу */}
+        <p style={{
+          fontSize: '0.75rem',
+          textAlign: 'center',
+          color: '#999',
+          marginTop: 'auto',
+          paddingTop: '1rem',
+          borderTop: '1px solid #eee'
+        }}>
+          Входя в систему, Вы соглашаетесь с условиями использования
+        </p>
       </div>
     </main>
   )
