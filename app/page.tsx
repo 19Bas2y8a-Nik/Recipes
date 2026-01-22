@@ -12,16 +12,16 @@ async function getNotes() {
     })
     return notes
   } catch (error) {
-    console.error('Error fetching notes:', error)
+    console.error('Ошибка при получении заметок:', error)
     // Логируем более детальную информацию об ошибке
     if (error instanceof Error) {
-      console.error('Error message:', error.message)
-      console.error('Error stack:', error.stack)
+      console.error('Сообщение об ошибке:', error.message)
+      console.error('Стек ошибки:', error.stack)
     }
     
     // Если соединение закрыто, пробуем переподключиться один раз
     if (error && typeof error === 'object' && 'kind' in error && error.kind === 'Closed') {
-      console.log('Connection closed, attempting to reconnect...')
+      console.log('Соединение закрыто, попытка переподключения...')
       try {
         await prisma.$connect()
         const notes = await prisma.note.findMany({
@@ -31,7 +31,7 @@ async function getNotes() {
         })
         return notes
       } catch (retryError) {
-        console.error('Retry failed:', retryError)
+        console.error('Повторная попытка не удалась:', retryError)
       }
     }
     

@@ -47,7 +47,8 @@ export default function LoginPage() {
         {/* Форма входа */}
         <form action={async () => {
           'use server'
-          await signIn('google', { redirectTo: '/' })
+          // signIn может выбросить NEXT_REDIRECT - это нормальное поведение Next.js
+          await signIn('google', { redirectTo: '/dashboard' })
         }}>
           <button
             type="submit"

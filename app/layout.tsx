@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Recipes - Next.js + Prisma + NeonDB',
-  description: 'Минимальный проект на Next.js с Prisma и NeonDB',
+  title: 'Recipes - Рецепты',
+  description: 'Приложение для управления рецептами на Next.js с Prisma и NeonDB',
 }
 
 export default function RootLayout({
