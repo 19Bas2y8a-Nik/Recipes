@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
-import { signIn, signOut } from '@/lib/auth-config'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
@@ -62,59 +61,19 @@ export default async function Home() {
           Next.js + Prisma + NeonDB
         </h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          {user ? (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                {user.image && (
-                  <img 
-                    src={user.image} 
-                    alt={user.name || 'User'} 
-                    style={{ 
-                      width: '32px', 
-                      height: '32px', 
-                      borderRadius: '50%' 
-                    }} 
-                  />
-                )}
-                <span style={{ fontSize: '0.875rem' }}>
-                  {user.name || user.email}
-                </span>
-              </div>
-              <form action={async () => {
-                'use server'
-                await signOut({ redirectTo: '/' })
-              }}>
-                <button
-                  type="submit"
-                  style={{
-                    padding: '0.5rem 1rem',
-                    fontSize: '0.875rem',
-                    background: '#dc2626',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Выйти
-                </button>
-              </form>
-            </>
-          ) : (
-            <Link 
-              href="/login"
-              style={{
-                padding: '0.5rem 1rem',
-                fontSize: '0.875rem',
-                background: '#0070f3',
-                color: 'white',
-                textDecoration: 'none',
-                borderRadius: '4px'
-              }}
-            >
-              Войти
-            </Link>
-          )}
+          <Link 
+            href="/login"
+            style={{
+              padding: '0.5rem 1rem',
+              fontSize: '0.875rem',
+              background: '#0070f3',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '4px'
+            }}
+          >
+            Войти
+          </Link>
         </div>
       </div>
       
