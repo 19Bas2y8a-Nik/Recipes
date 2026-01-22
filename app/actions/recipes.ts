@@ -24,13 +24,18 @@ export async function createRecipe(formData: FormData) {
       isPublic: formData.get('isPublic') === 'true' || formData.get('isPublic') === 'on',
     }
 
-    const validated = recipeSchema.parse(data)
+    const result = recipeSchema.safeParse(data)
+    
+    if (!result.success) {
+      const firstIssue = result.error.issues[0]
+      return { error: firstIssue?.message || 'Ошибка валидации' }
+    }
 
     const recipe = await prisma.recip.create({
       data: {
-        title: validated.title,
-        content: validated.content,
-        visibility: validated.isPublic ? 'PUBLIC' : 'PRIVATE',
+        title: result.data.title,
+        content: result.data.content,
+        visibility: result.data.isPublic ? 'PUBLIC' : 'PRIVATE',
         isFavorite: false,
         ownerId: userId,
       },
@@ -39,9 +44,6 @@ export async function createRecipe(formData: FormData) {
     revalidatePath('/dashboard')
     return { success: true, recipe }
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message }
-    }
     console.error('Ошибка при создании рецепта:', error)
     return { error: 'Ошибка при создании рецепта' }
   }
@@ -69,23 +71,25 @@ export async function updateRecipe(id: string, formData: FormData) {
       isPublic: formData.get('isPublic') === 'true' || formData.get('isPublic') === 'on',
     }
 
-    const validated = recipeSchema.parse(data)
+    const result = recipeSchema.safeParse(data)
+    
+    if (!result.success) {
+      const firstIssue = result.error.issues[0]
+      return { error: firstIssue?.message || 'Ошибка валидации' }
+    }
 
     const recipe = await prisma.recip.update({
       where: { id },
       data: {
-        title: validated.title,
-        content: validated.content,
-        visibility: validated.isPublic ? 'PUBLIC' : 'PRIVATE',
+        title: result.data.title,
+        content: result.data.content,
+        visibility: result.data.isPublic ? 'PUBLIC' : 'PRIVATE',
       },
     })
 
     revalidatePath('/dashboard')
     return { success: true, recipe }
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { error: error.errors[0].message }
-    }
     console.error('Ошибка при обновлении рецепта:', error)
     return { error: 'Ошибка при обновлении рецепта' }
   }
