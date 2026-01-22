@@ -55,6 +55,18 @@ function getAuthConfig() {
           }
           return token
         },
+        async redirect({ url, baseUrl }) {
+          // После успешного входа перенаправляем на дашборд
+          if (url.startsWith('/')) {
+            return `${baseUrl}${url}`
+          }
+          // Если URL уже полный и ведет на наш домен, используем его
+          if (url.startsWith(baseUrl)) {
+            return url
+          }
+          // По умолчанию перенаправляем на дашборд
+          return `${baseUrl}/dashboard`
+        },
       },
       debug: process.env.NODE_ENV === 'development',
     })

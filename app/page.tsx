@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { signIn, signOut } from '@/lib/auth-config'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
 async function getNotes() {
@@ -40,8 +41,14 @@ async function getNotes() {
 }
 
 export default async function Home() {
-  const notes = await getNotes()
   const user = await getCurrentUser()
+  
+  // Если пользователь авторизован, перенаправляем на дашборд
+  if (user) {
+    redirect('/dashboard')
+  }
+  
+  const notes = await getNotes()
 
   return (
     <main style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
