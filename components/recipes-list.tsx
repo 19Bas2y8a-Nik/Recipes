@@ -13,6 +13,8 @@ interface Recipe {
   isFavorite: boolean
   createdAt: Date
   updatedAt: Date
+  likesCount?: number
+  likedByMe?: boolean
 }
 
 interface RecipesListProps {
@@ -34,6 +36,7 @@ export function RecipesList({ recipes }: RecipesListProps) {
           <RecipeCard
             key={recipe.id}
             recipe={recipe}
+            showLikeButton={recipe.likesCount !== undefined}
             onEdit={(recipe) => {
               setEditingRecipe(recipe)
               setIsDialogOpen(true)

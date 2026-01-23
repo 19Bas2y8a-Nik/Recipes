@@ -21,6 +21,7 @@ model User {
   notes       Note[]
   recips      Recip[]
   votes       Vote[]
+  likes       RecipeLike[]
   collections Collection[]
   accounts    Account[]
   sessions    Session[]
@@ -104,6 +105,7 @@ model Recip {
   owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   votes       Vote[]
+  likes       RecipeLike[]
   tags        TagOnRecip[]
   collections RecipInCollection[]
   versions    RecipVersion[]
@@ -151,6 +153,20 @@ model Vote {
   @@index([recipId])
   @@index([userId])
   @@map("votes")
+}
+
+model RecipeLike {
+  id        String   @id @default(cuid())
+  userId    String
+  recipeId  String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recip    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+  @@index([recipeId])
+  @@map("recipe_likes")
 }
 
 model Collection {

@@ -12,6 +12,7 @@ import { Star, Globe, Lock, Pencil, Trash2, MoreVertical } from 'lucide-react'
 import { toggleFavorite, togglePublic, deleteRecipe } from '@/app/actions/recipes'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { LikeButton } from './like-button'
 
 interface RecipeCardProps {
   recipe: {
@@ -22,11 +23,14 @@ interface RecipeCardProps {
     isFavorite: boolean
     createdAt: Date
     updatedAt: Date
+    likesCount?: number
+    likedByMe?: boolean
   }
   onEdit: (recipe: any) => void
+  showLikeButton?: boolean
 }
 
-export function RecipeCard({ recipe, onEdit }: RecipeCardProps) {
+export function RecipeCard({ recipe, onEdit, showLikeButton = false }: RecipeCardProps) {
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const preview = recipe.content.length > 150 
@@ -105,15 +109,24 @@ export function RecipeCard({ recipe, onEdit }: RecipeCardProps) {
           {preview}
         </CardDescription>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          variant={recipe.isFavorite ? "default" : "outline"}
-          size="sm"
-          onClick={handleToggleFavorite}
-        >
-          <Star className={`h-4 w-4 mr-2 ${recipe.isFavorite ? 'fill-current' : ''}`} />
-          {recipe.isFavorite ? 'В избранном' : 'В избранное'}
-        </Button>
+      <CardFooter className="flex justify-between items-center">
+        {showLikeButton && recipe.visibility === 'PUBLIC' ? (
+          <LikeButton
+            recipeId={recipe.id}
+            initialLiked={recipe.likedByMe ?? false}
+            initialCount={recipe.likesCount ?? 0}
+            disabled={recipe.likedByMe === undefined}
+          />
+        ) : (
+          <Button
+            variant={recipe.isFavorite ? "default" : "outline"}
+            size="sm"
+            onClick={handleToggleFavorite}
+          >
+            <Star className={`h-4 w-4 mr-2 ${recipe.isFavorite ? 'fill-current' : ''}`} />
+            {recipe.isFavorite ? 'В избранном' : 'В избранное'}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )
