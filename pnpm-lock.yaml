@@ -9,7 +9,7 @@ dependencies:
     specifier: ^2.11.1
     version: 2.11.1(@prisma/client@5.22.0)
   '@prisma/client':
-    specifier: ^5.7.1
+    specifier: ^5.22.0
     version: 5.22.0(prisma@5.22.0)
   '@radix-ui/react-dialog':
     specifier: ^1.1.15
@@ -65,7 +65,7 @@ devDependencies:
     specifier: ^8.5.6
     version: 8.5.6
   prisma:
-    specifier: ^5.7.1
+    specifier: ^5.22.0
     version: 5.22.0
   tailwindcss:
     specifier: 3.4.0
